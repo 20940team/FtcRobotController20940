@@ -24,15 +24,21 @@ public class Robot2022 extends Robot {
 
 
     public void teleOp() {
-        frontAndBack();
+        driveOmni();
     }
 
-    public void frontAndBack() {
+    public void driveOmni() {
 
         LF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
         LB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-        RF.setPower(-gamepad1.left_stick_y + gamepad1.left_stick_x);
-        RB.setPower(-gamepad1.left_stick_y - gamepad1.left_stick_x);
+        RF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
+        RB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
+    }
+
+    public void init() {
+
+        RF.setDirection(DcMotorSimple.Direction.REVERSE);
+        RB.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
 }
