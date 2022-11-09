@@ -17,13 +17,10 @@ public class Robot2022 extends Robot {
         RF = hardwareMap.get(DcMotor.class, "right_front_drive");
         RB = hardwareMap.get(DcMotor.class, "right_back_drive");
 
-
-
     }
 
-
-
     public void teleOp() {
+        init();
         driveOmni();
     }
 
