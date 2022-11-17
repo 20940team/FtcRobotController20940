@@ -28,25 +28,27 @@ public class Robot2022 extends Robot {
         RB.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public void teleOp() { //20940megapassword
+    public void teleOp() {
+
         driveOmni();
-       if (gamepad1.dpad_up) {
-           UP.setPower(1);
-       }
-       else if (gamepad1.dpad_down) {
-           UP.setPower(-1);
-       }
-       else UP.setPower(0);
+        if (gamepad1.dpad_up) {
+            UP.setPower(1);
+        }
+        else if (gamepad1.dpad_down) {
+            UP.setPower(-1);
+        }
+        else UP.setPower(0);
 
 
-       if (gamepad1.a) {
-           grab.setPosition(0.5);
-       } else if (gamepad1.x) {
-           grab.setPosition(0.7);
-       }
+        if (gamepad1.a) {
+            grab.setPosition(0.5);
+        }
+        else if (gamepad1.x) {
+            grab.setPosition(0.7);
+        }
 
-       telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
-       telemetry.update();
+        telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
+        telemetry.update();
     }
 
     public void driveOmni() {
