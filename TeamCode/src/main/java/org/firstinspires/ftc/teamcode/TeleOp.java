@@ -11,6 +11,7 @@ public class TeleOp extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Robot2022 R = new Robot2022(hardwareMap, telemetry,this);
         R.init();
+        R.gamepadInit(gamepad1, gamepad2);
         waitForStart();
         while (!isStopRequested()){
             R.teleOp();
