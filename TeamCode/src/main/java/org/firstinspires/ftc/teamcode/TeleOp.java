@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 public class TeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        Robot2022 R = new Robot2022(hardwareMap, telemetry,linearOpMode);
+        Robot2022 R = new Robot2022(hardwareMap, telemetry,this);
+        R.init();
         waitForStart();
         while (!isStopRequested()){
             R.teleOp();
