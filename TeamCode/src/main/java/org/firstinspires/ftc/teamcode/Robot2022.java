@@ -45,6 +45,8 @@ public class Robot2022 extends Robot {
            grab.setPosition(0.7);
        }
 
+       telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
+       telemetry.update();
     }
 
     public void driveOmni() {
