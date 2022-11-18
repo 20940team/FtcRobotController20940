@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -54,13 +55,12 @@ public class Robot2022 extends Robot {
 
     public void driveOmni() {
 
-        LF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-        LB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
-        RF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
-        RB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
+        LF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
+        LB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
+        RF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
+        RB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
 
-        gamepad1.right_trigger = gamepad1.left_stick_x;
-        gamepad1.left_trigger = -gamepad1.left_stick_x;
+
     }
 
     public void GoTimer(double x, double y, double time) {
