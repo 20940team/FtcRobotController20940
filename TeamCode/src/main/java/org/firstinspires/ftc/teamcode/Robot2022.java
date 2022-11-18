@@ -19,7 +19,7 @@ public class Robot2022 extends Robot {
         LB = hardwareMap.get(DcMotor.class, "lb");
         RF = hardwareMap.get(DcMotor.class, "rf");
         RB = hardwareMap.get(DcMotor.class, "rb");
-        UP = hardwareMap.get(DcMotor.class, "up");
+        UP = hardwareMap.get(DcMotor.class, "upw");
         grab = hardwareMap.get(Servo.class, "grab");
 
     }
@@ -34,11 +34,13 @@ public class Robot2022 extends Robot {
         driveOmni();
         if (gamepad1.dpad_up) {
             UP.setPower(1);
-        }
-        else if (gamepad1.dpad_down) {
+
+        } else if (gamepad1.dpad_down) {
             UP.setPower(-1);
+
+        } else {
+            UP.setPower(0);
         }
-        else UP.setPower(0);
 
 
         if (gamepad1.a) {
@@ -50,15 +52,17 @@ public class Robot2022 extends Robot {
 
         telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
         telemetry.addData("gamepad1_left_x: ",gamepad1.left_stick_x);
+        telemetry.addData("down grab: ",gamepad1.dpad_down);
+        telemetry.addData("up grab: ",gamepad1.dpad_up);
         telemetry.update();
     }
 
     public void driveOmni() {
 
-        LF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
-        LB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-        RF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-        RB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
+        LF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
+        LB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
+        RF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
+        RB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
 
 
     }
