@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="AutoBlueRightPark", group="Robot2")
+@Autonomous(name="AutoBlueRightPark", group="")
 public class AutoBlueRightPark extends LinearOpMode {
 
     @Override
