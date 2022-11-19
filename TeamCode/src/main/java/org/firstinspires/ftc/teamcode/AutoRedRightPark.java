@@ -2,8 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="Robot: Auto Drive By Time", group="Robot")
+@Autonomous(name="AutoRedRightPark", group="Robot")
 public class AutoRedRightPark extends LinearOpMode {
 
     @Override
@@ -13,6 +14,6 @@ public class AutoRedRightPark extends LinearOpMode {
 
         waitForStart();
 
-
+        R.GoTimer(0.26,0,5000);
     }
 }

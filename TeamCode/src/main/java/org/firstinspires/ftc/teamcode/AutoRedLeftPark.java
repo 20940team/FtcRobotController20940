@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="Robot: Auto Drive By Time", group="Robot")
+@Autonomous(name=" AutoRedLeftPark", group="Robot")
 public class AutoRedLeftPark extends LinearOpMode {
 
     @Override
@@ -13,6 +13,6 @@ public class AutoRedLeftPark extends LinearOpMode {
 
         waitForStart();
 
-
+        R.GoTimer(-0.26,0,5000);
     }
 }
