@@ -44,7 +44,11 @@ public class Robot2022 extends Robot {
 
         telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
         telemetry.addData("gamepad1_left_x: ",gamepad1.left_stick_x);
-        telemetry.addData("grab :", gamepad1.right_stick_y);
+        telemetry.addData("grab:", gamepad1.right_stick_y);
+        telemetry.addData("lf: ", LF);
+        telemetry.addData("lb: ", LB);
+        telemetry.addData("rf: ", RF);
+        telemetry.addData("rb: ", RB);
         telemetry.update();
     }
 
@@ -54,11 +58,17 @@ public class Robot2022 extends Robot {
         LB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
         RF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
         RB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-
-
     }
 
     public void GoTimer(double x, double y, double time) {
+        LF.setPower(y - x);
+        LB.setPower(y + x);
+        RF.setPower(y + x);
+        RB.setPower(y - x);
+        delay(time);
+    }
+
+    public void Rotate() {
 
     }
 }
