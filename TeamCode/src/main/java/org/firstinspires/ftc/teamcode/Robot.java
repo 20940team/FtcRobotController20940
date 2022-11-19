@@ -29,7 +29,7 @@ public abstract class Robot {
 
     public final void delay(double milliseconds) {
         try {
-            Thread.sleep(milliseconds);
+            Thread.sleep((long) milliseconds);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
