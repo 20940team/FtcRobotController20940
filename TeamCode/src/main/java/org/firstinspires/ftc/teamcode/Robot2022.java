@@ -32,15 +32,7 @@ public class Robot2022 extends Robot {
     public void teleOp() {
 
         driveOmni();
-        if (gamepad1.dpad_up) {
-            UP.setPower(1);
-
-        } else if (gamepad1.dpad_down) {
-            UP.setPower(-1);
-
-        } else {
-            UP.setPower(0);
-        }
+        UP.setPower(gamepad1.right_stick_y);
 
 
         if (gamepad1.a) {
@@ -52,8 +44,7 @@ public class Robot2022 extends Robot {
 
         telemetry.addData("gamepad1_left_y: ",gamepad1.left_stick_y);
         telemetry.addData("gamepad1_left_x: ",gamepad1.left_stick_x);
-        telemetry.addData("down grab: ",gamepad1.dpad_down);
-        telemetry.addData("up grab: ",gamepad1.dpad_up);
+        telemetry.addData("grab :", gamepad1.right_stick_y);
         telemetry.update();
     }
 
