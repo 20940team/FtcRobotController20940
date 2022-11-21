@@ -37,6 +37,7 @@ public class Robot2022 extends Robot {
         RB.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+
     public void teleOp() {
 
         driveOmni();
@@ -73,5 +74,15 @@ public class Robot2022 extends Robot {
         RB.setPower(y - x);
         delay(time);
     }
+
+    public void Arm(double x, double time) {
+        UP.setPower(x);
+        delay(time);
+    }
+
+    public void ArmServo(double x) {
+        grab.setPosition(x);
+    }
+
 
 }
