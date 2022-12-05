@@ -54,7 +54,7 @@ public class Robot2022 extends Robot {
         telemetry.addData("left_y: ",gamepad1.left_stick_y);
         telemetry.addData("left_x: ",gamepad1.left_stick_x);
         telemetry.addData("grab arm: ", gamepad1.right_stick_y);
-        telemetry.addData("right trigger: ", gamepad1.right_trigger );
+        telemetry.addData("right trigger: ", gamepad1.right_trigger);
         telemetry.addData("left trigger: ", gamepad1.left_trigger );
         telemetry.update();
     }
@@ -80,9 +80,7 @@ public class Robot2022 extends Robot {
         delay(time);
     }
 
-    public void ArmServo(double x) {
-        grab.setPosition(x);
-    }
+    public void ArmServo(double x) {grab.setPosition(x);}
 
 
 }
