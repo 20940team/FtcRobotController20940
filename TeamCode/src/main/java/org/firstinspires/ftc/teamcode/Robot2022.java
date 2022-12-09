@@ -45,11 +45,9 @@ public class Robot2022 extends Robot {
 
 
         if (gamepad1.x) {
-            grab.setPosition(0.55);
-        }
-        else if (gamepad1.a) {
-            grab.setPosition(0.75);
-        }
+            grab.setPosition(0.54);
+        } else if (gamepad1.a) {
+            grab.setPosition(0.4);}
 
         telemetry.addData("left_y: ",gamepad1.left_stick_y);
         telemetry.addData("left_x: ",gamepad1.left_stick_x);
