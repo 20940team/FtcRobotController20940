@@ -14,12 +14,6 @@ public class AutoBlueRightPark extends LinearOpMode {
 
         waitForStart();
 
-        R.ArmServo(0.4);
-        R.Arm(-0.4, 1200);
-        R.GoTimer(0, -0.5, 600);
-        R.Arm(0.4, 400);
-        R.ArmServo(0.5);
-        R.GoTimer(0, 0.5, 600);
-        R.Arm(0.4, 800);
+        R.GoTimer(0,0.25, 2500);
     }
 }

@@ -41,12 +41,16 @@ public class Robot2022 extends Robot {
     public void teleOp() {
 
         driveOmni();
-        UP.setPower(gamepad1.right_stick_y * 0.7);
+        UP.setPower(gamepad2.right_stick_y * 0.7);
 
+        if (gamepad2.y) {
+            Arm(-0.15, 100);
+        } else if (gamepad2.b) {
+            Arm(0.25, 400);}
 
-        if (gamepad1.x) {
-            grab.setPosition(0.54);
-        } else if (gamepad1.a) {
+        if (gamepad2.x) {
+            grab.setPosition(0.65);
+        } else if (gamepad2.a) {
             grab.setPosition(0.4);}
 
         telemetry.addData("left_y: ",gamepad1.left_stick_y);
