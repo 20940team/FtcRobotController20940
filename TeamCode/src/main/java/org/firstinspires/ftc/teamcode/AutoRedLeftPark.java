@@ -13,6 +13,6 @@ public class AutoRedLeftPark extends LinearOpMode {
 
         waitForStart();
 
-
+            R.GoTimer(0, 0.4, 2500);
     }
 }

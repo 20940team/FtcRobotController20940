@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class Robot2022 extends Robot {
     DcMotor RF, LF, LB, RB, UP;
     Servo grab;
+    BNO055IMU imu;
 
     Robot2022(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         super(hardwareMap, telemetry, linearOpMode);
@@ -28,9 +29,28 @@ public class Robot2022 extends Robot {
         UP = hardwareMap.get(DcMotor.class, "upw");
         grab = hardwareMap.get(Servo.class, "grab");
 
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters(); //Акселерометр
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+        while (!imu.isGyroCalibrated()) { //Калибровка акселерометра
+            delay(30);
+            telemetry.addData("Wait", "Calibration"); //Сообщение о калибровке
+            telemetry.update();
+        }
+        telemetry.addData("Done!", "Calibrated"); //Сообщение об окончании калибровки
+        telemetry.update();
     }
-
-
+    double getAngle() { //Функция получения данных с акселерометра
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        Acceleration gravity = imu.getGravity();
+        return angles.firstAngle;
+    }
 
     public void init() {
         RF.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -63,10 +83,21 @@ public class Robot2022 extends Robot {
 
     public void driveOmni() {
 
-        LF.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
-        LB.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
-        RF.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.left_trigger + gamepad1.right_trigger);
-        RB.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.left_trigger + gamepad1.right_trigger);
+        double lf = (gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
+        double lb = (gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
+        double rf = (gamepad1.left_stick_y + gamepad1.left_stick_x - gamepad1.left_trigger + gamepad1.right_trigger);
+        double rb = (gamepad1.left_stick_y - gamepad1.left_stick_x - gamepad1.left_trigger + gamepad1.right_trigger);
+        RF.setPower(rf);
+        RB.setPower(rb);
+        LF.setPower(lf);
+        LB.setPower(lb);
+    }
+
+    public void setMtPower(double lf, double lb, double rf, double rb) {
+        LF.setPower(lf);
+        LB.setPower(lb);
+        RF.setPower(rf);
+        RB.setPower(rb);
     }
 
     public void GoTimer(double x, double y, double time) {
@@ -84,5 +115,17 @@ public class Robot2022 extends Robot {
 
     public void ArmServo(double x) {grab.setPosition(x);}
 
+    public void Rotate(double degrees) {
+
+        double ERROR = 4;
+        while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
+            ERROR = degrees - getAngle();
+            double kr = 0.4;
+            double RELE = kr * Math.signum(ERROR);
+            double pw = RELE;
+            setMtPower(pw, pw, pw, pw);
+        }
+            setMtPower(0, 0, 0, 0);
+    }
 
 }
