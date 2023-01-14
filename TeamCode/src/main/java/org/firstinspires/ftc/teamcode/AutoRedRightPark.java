@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="AutoRedRightPark", group="")
+@Autonomous(name="конус + парковка (слева со стороны драйвера)", group="")
 public class AutoRedRightPark extends LinearOpMode {
 
     @Override
@@ -14,6 +14,16 @@ public class AutoRedRightPark extends LinearOpMode {
 
         waitForStart();
 
-
+        R.ArmServo(0.75);
+        R.delay(200);
+        R.Arm(-0.4, 600);
+        R.delay(200);
+        R.GoTimer(0, -0.2, 500);
+        R.delay(200);
+        R.ArmServo(0.4);
+        R.delay(200);
+        R.Rotate(-35);
+        R.delay(200);
+        R.GoTimer(0, -0.5, 2250);
     }
 }

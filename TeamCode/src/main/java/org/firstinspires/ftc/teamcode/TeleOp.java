@@ -14,6 +14,7 @@ public class TeleOp extends LinearOpMode {
         R.gamepadInit(gamepad1, gamepad2);
         waitForStart();
         while (!isStopRequested()){
+            R.driveOmni();
             R.teleOp();
         }
         telemetry.addData("Stop", "program");

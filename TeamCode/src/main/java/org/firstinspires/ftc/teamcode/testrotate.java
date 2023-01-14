@@ -2,9 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="парковка", group="")
-public class AutoRedLeftPark extends LinearOpMode {
+@Autonomous(name="test", group="")
+public class  testrotate extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -13,6 +14,8 @@ public class AutoRedLeftPark extends LinearOpMode {
 
         waitForStart();
 
-            R.GoTimer(0, -0.5, 2500);
+        R.Rotate(90);
+        R.delay(10000);
+        R.Rotate(-90);
     }
 }

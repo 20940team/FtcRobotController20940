@@ -60,7 +60,7 @@ public class Robot2022 extends Robot {
 
     public void teleOp() {
 
-        driveOmni();
+        //driveOmni();
         UP.setPower(gamepad2.right_stick_y * 0.7);
 
         if (gamepad2.y) {
@@ -69,15 +69,16 @@ public class Robot2022 extends Robot {
             Arm(0.25, 400);}
 
         if (gamepad2.x) {
-            grab.setPosition(0.65);
+            grab.setPosition(0.75);
         } else if (gamepad2.a) {
-            grab.setPosition(0.4);}
+            grab.setPosition(0.5);}
 
         telemetry.addData("left_y: ",gamepad1.left_stick_y);
         telemetry.addData("left_x: ",gamepad1.left_stick_x);
         telemetry.addData("grab arm: ", gamepad1.right_stick_y);
         telemetry.addData("right trigger: ", gamepad1.right_trigger);
         telemetry.addData("left trigger: ", gamepad1.left_trigger );
+        telemetry.addData("бобры бобры вы так добры: ", getAngle());
         telemetry.update();
     }
 
@@ -106,24 +107,54 @@ public class Robot2022 extends Robot {
         RF.setPower(y + x);
         RB.setPower(y - x);
         delay(time);
+        LF.setPower(0);
+        LB.setPower(0);
+        RF.setPower(0);
+        RB.setPower(0);
     }
 
     public void Arm(double x, double time) {
         UP.setPower(x);
         delay(time);
+        UP.setPower(-0.15);
+    }
+    static final double MAX_POS     =  1.0;     // Maximum rotational position
+    static final double MIN_POS     =  0.0;     // Minimum rotational position
+
+    double  position = (MAX_POS - MIN_POS) / 2;
+
+    public void ArmServo(double x) {
+        grab.setPosition(x);
     }
 
-    public void ArmServo(double x) {grab.setPosition(x);}
-
     public void Rotate(double degrees) {
+        /*
+         1) 0 0 0 0:
+         2) 0 0 0 1:
+         3) 0 0 1 0:
+         4) 0 0 1 1:
+         5) 0 1 0 0:
+         6) 0 1 0 1:
+         7) 0 1 1 0:
+         8) 0 1 1 1:
+         9) 1 0 0 0:
+        10) 1 0 0 1:
+        11) 1 0 1 0:
+        12) 1 0 1 1:
+        13) 1 1 0 0:
+        14) 1 1 0 1:
+        15) 1 1 1 0: rotates, slightly moves forward
+        16) 1 1 1 1:
+         test values
+         */  //rotation test\\
 
         double ERROR = 4;
         while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
-            ERROR = degrees - getAngle();
-            double kr = 0.4;
+            ERROR = -degrees - getAngle();
+            double kr = 0.3;
             double RELE = kr * Math.signum(ERROR);
-            double pw = RELE;
-            setMtPower(pw, pw, pw, pw);
+            double pwf = RELE;
+            setMtPower(-pwf, pwf, pwf, pwf);
         }
             setMtPower(0, 0, 0, 0);
     }
