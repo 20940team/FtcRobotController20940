@@ -16,13 +16,13 @@ public class AutoBlueRightPark extends LinearOpMode {
 
         waitForStart();
 
-    R.ArmServo(0.75);
+    R.armServo(0.75);
     R.delay(100);
-    R.Arm(-0.4, 800);
+    R.arm(-0.4, 800);
     R.delay(100);
-    R.GoTimer(0, -0.2, 500);
+    R.goTimer(0, -0.2, 500);
     R.delay(100);
-    R.ArmServo(0.4);
+    R.armServo(0.4);
 
     }
 }

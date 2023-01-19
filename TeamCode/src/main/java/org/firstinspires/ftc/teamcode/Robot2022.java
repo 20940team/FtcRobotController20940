@@ -64,9 +64,9 @@ public class Robot2022 extends Robot {
         UP.setPower(gamepad2.right_stick_y * 0.7);
 
         if (gamepad2.y) {
-            Arm(-0.15, 100);
+            arm(-0.15, 100);
         } else if (gamepad2.b) {
-            Arm(0.25, 400);}
+            arm(0.25, 400);}
 
         if (gamepad2.x) {
             grab.setPosition(0.75);
@@ -78,7 +78,8 @@ public class Robot2022 extends Robot {
         telemetry.addData("grab arm: ", gamepad1.right_stick_y);
         telemetry.addData("right trigger: ", gamepad1.right_trigger);
         telemetry.addData("left trigger: ", gamepad1.left_trigger );
-        telemetry.addData("бобры бобры вы так добры: ", getAngle());
+        telemetry.addData("a ", getAngle());
+
         telemetry.update();
     }
 
@@ -101,7 +102,7 @@ public class Robot2022 extends Robot {
         RB.setPower(rb);
     }
 
-    public void GoTimer(double x, double y, double time) {
+    public void goTimer(double x, double y, double time) {
         LF.setPower(y - x);
         LB.setPower(y + x);
         RF.setPower(y + x);
@@ -113,7 +114,7 @@ public class Robot2022 extends Robot {
         RB.setPower(0);
     }
 
-    public void Arm(double x, double time) {
+    public void arm(double x, double time) {
         UP.setPower(x);
         delay(time);
         UP.setPower(-0.15);
@@ -123,20 +124,20 @@ public class Robot2022 extends Robot {
 
     double  position = (MAX_POS - MIN_POS) / 2;
 
-    public void ArmServo(double x) {
+    public void armServo(double x) {
         grab.setPosition(x);
     }
 
-    public void Rotate(double degrees) {
+    public void rotate(double degrees) {
         /*
-         1) 0 0 0 0:
-         2) 0 0 0 1:
-         3) 0 0 1 0:
-         4) 0 0 1 1:
+         1) 0 0 0 0: moves backwards
+         2) 0 0 0 1: rotates, while moving backwards and then shaking
+         3) 0 0 1 0: rotates moving backwards
+         4) 0 0 1 1: rotates a lot more 90 degress and shakes
          5) 0 1 0 0:
          6) 0 1 0 1:
          7) 0 1 1 0:
-         8) 0 1 1 1:
+         8) 0 1 1 1: rotates around 1 motor
          9) 1 0 0 0:
         10) 1 0 0 1:
         11) 1 0 1 0:
@@ -150,13 +151,23 @@ public class Robot2022 extends Robot {
 
         double ERROR = 4;
         while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
-            ERROR = -degrees - getAngle();
+            ERROR = degrees - getAngle();
             double kr = 0.3;
+            double k = 0.003;
+
+            double pwr = k * ERROR;
             double RELE = kr * Math.signum(ERROR);
             double pwf = RELE;
-            setMtPower(-pwf, pwf, pwf, pwf);
+            setMtPower(pwf, pwf, -pwf, -pwf);
+
+            telemetry.addData("ERROR", ERROR);
+            telemetry.addData("pwf", pwf);
+            telemetry.addData("pwr", pwr);
+            telemetry.update();
+
         }
-            setMtPower(0, 0, 0, 0);
+        setMtPower(0, 0, 0, 0);
     }
 
 }
+//ftc dashboard

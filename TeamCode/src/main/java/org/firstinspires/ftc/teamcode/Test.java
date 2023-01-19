@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import java.util.concurrent.Delayed;
 
-@Autonomous(name="Тест", group="НЕ ВКЛЮЧАТЬ НЕ В КОЕМ СЛУЧАЕ")
+@Autonomous(name="тест подьема ", group="НЕ ВКЛЮЧАТЬ НЕ В КОЕМ СЛУЧАЕ")
 public class Test extends LinearOpMode {
 
     @Override
@@ -16,7 +16,8 @@ public class Test extends LinearOpMode {
 
         waitForStart();
 
-        R.Rotate(90);
+        R.arm(-0.4, 7000);
+        R.arm(0.4, 7000);
 
     }
 }

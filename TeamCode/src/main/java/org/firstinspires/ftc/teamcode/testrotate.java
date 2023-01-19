@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous(name="test", group="")
 public class  testrotate extends LinearOpMode {
@@ -14,8 +13,11 @@ public class  testrotate extends LinearOpMode {
 
         waitForStart();
 
-        R.Rotate(90);
-        R.delay(10000);
-        R.Rotate(-90);
+        R.rotate(90);
+        R.delay(1000);
+        R.rotate(-90);
+        R.delay(1000);
+        R.rotate(0);
+
     }
 }

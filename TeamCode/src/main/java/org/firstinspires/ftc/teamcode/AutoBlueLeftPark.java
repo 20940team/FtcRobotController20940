@@ -13,16 +13,16 @@ public class AutoBlueLeftPark extends LinearOpMode {
 
         waitForStart();
 
-        R.ArmServo(0.75);
+        R.armServo(0.75);
         R.delay(200);
-        R.Arm(-0.4, 600);
+        R.arm(-0.4, 600);
         R.delay(200);
-        R.GoTimer(0, -0.2, 500);
+        R.goTimer(0, -0.2, 500);
         R.delay(200);
-        R.ArmServo(0.4);
+        R.armServo(0.4);
         R.delay(200);
-        R.Rotate(35);
+        R.rotate(35);
         R.delay(200);
-        R.GoTimer(0, -0.5, 2250);
+        R.goTimer(0, -0.5, 2250);
     }
 }
