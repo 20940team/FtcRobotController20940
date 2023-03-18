@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import java.util.concurrent.Delayed;
-
-@Autonomous(name="тест подьема ", group="НЕ ВКЛЮЧАТЬ НЕ В КОЕМ СЛУЧАЕ")
+@Disabled
+@Autonomous(name="тест подьема (шучу)", group="НЕ ВКЛЮЧАТЬ НЕ В КОЕМ СЛУЧАЕ")
 public class Test extends LinearOpMode {
 
     @Override
@@ -16,8 +17,7 @@ public class Test extends LinearOpMode {
 
         waitForStart();
 
-        R.arm(-0.4, 7000);
-        R.arm(0.4, 7000);
+        R.goTimer(0, -0.2, 2000);
 
     }
 }

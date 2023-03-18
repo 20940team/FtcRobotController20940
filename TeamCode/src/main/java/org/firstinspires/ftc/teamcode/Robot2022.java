@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,18 +12,27 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.vuforia.CameraDevice;
+import com.vuforia.Image;
+import com.vuforia.PIXEL_FORMAT;
+import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
+@Config
 public class Robot2022 extends Robot {
     DcMotor RF, LF, LB, RB, UP;
     Servo grab;
     BNO055IMU imu;
+    VuforiaLocalizerImpl vuforia;
 
     Robot2022(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         super(hardwareMap, telemetry, linearOpMode);
@@ -57,11 +71,25 @@ public class Robot2022 extends Robot {
         RB.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
+    public void telemetry() {
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+        dashboardTelemetry.addData("left_y", gamepad1.left_stick_y);
+        dashboardTelemetry.addData("left_x", gamepad1.left_stick_x);
+        dashboardTelemetry.addData("right trigger", gamepad1.right_trigger);
+        dashboardTelemetry.addData("left trigger", gamepad1.left_trigger );
+        dashboardTelemetry.update();
+    }
+
+    public static double open = 0.15;
+    public static double close = 0.40;
 
     public void teleOp() {
 
-        //driveOmni();
-        UP.setPower(gamepad2.right_stick_y * 0.7);
+        UP.setPower(gamepad2.right_stick_y);
 
         if (gamepad2.y) {
             arm(-0.15, 100);
@@ -69,21 +97,28 @@ public class Robot2022 extends Robot {
             arm(0.25, 400);}
 
         if (gamepad2.x) {
-            grab.setPosition(0.75);
+            grab.setPosition(close);
         } else if (gamepad2.a) {
-            grab.setPosition(0.5);}
+            grab.setPosition(open);}
 
         telemetry.addData("left_y: ",gamepad1.left_stick_y);
         telemetry.addData("left_x: ",gamepad1.left_stick_x);
-        telemetry.addData("grab arm: ", gamepad1.right_stick_y);
         telemetry.addData("right trigger: ", gamepad1.right_trigger);
         telemetry.addData("left trigger: ", gamepad1.left_trigger );
-        telemetry.addData("a ", getAngle());
+        telemetry.addData("getAngle: ", getAngle());
+        telemetry.addData("grab angles", grab.getPosition());
 
         telemetry.update();
     }
 
     public void driveOmni() {
+
+        /*
+        double sigx = Math.signum(gamepad1.left_stick_x);
+        double sigy = Math.signum(gamepad1.left_stick_y);
+        double x = (gamepad1.left_stick_x* gamepad1.left_stick_x)*sigx;
+        double y = (gamepad1.left_stick_y* gamepad1.left_stick_y)*sigy;
+        */
 
         double lf = (gamepad1.left_stick_y - gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
         double lb = (gamepad1.left_stick_y + gamepad1.left_stick_x + gamepad1.left_trigger - gamepad1.right_trigger);
@@ -114,55 +149,120 @@ public class Robot2022 extends Robot {
         RB.setPower(0);
     }
 
+
     public void arm(double x, double time) {
         UP.setPower(x);
         delay(time);
         UP.setPower(-0.15);
     }
-    static final double MAX_POS     =  1.0;     // Maximum rotational position
-    static final double MIN_POS     =  0.0;     // Minimum rotational position
 
-    double  position = (MAX_POS - MIN_POS) / 2;
+    public void armServo(double x) { grab.setPosition(x);}
 
-    public void armServo(double x) {
-        grab.setPosition(x);
+
+    //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
+    //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
+
+
+    public void initVuforia() {
+
+        final String VUFORIA_KEY = "AXmpKJj/////AAABmcT291bCTEQeoCRi1kDOyP8ApoUammAer00aO1owWHeTV7AmOtKkjy/8jRV99nQLFDMqq8eFrFk02tC3e24Hk9u4pnB+m2zRTTtVlIJ9G248PtXINEGUoPi+W2t53dbLT5+RSxBdMGDAKC7aeTv0tlpN1zNLnxYbVKqgbsIKU5C5FOGByrJU7xGP/qLDsY/TAlNbcq73vL9ClSAGo0Im+77mABDEXUVZilP05IR5sbXJYHo/J9O2U8ZfX4KnpnNbPWzzGBFpyKrVRNYihX7s/pjlitY6Fok2sQ+PX4XDoCu3dw/9rtnqpMwTkBtrzvmVuL01zVmKcf8e31FWafJ2I1CBJ5t2OJbrOO0m4NiELoUL";
+
+        OpenGLMatrix targetPose     = null;
+        String targetName           = "";
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("Camera", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parametersWebcam = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+
+        parametersWebcam.vuforiaLicenseKey = VUFORIA_KEY;
+        parametersWebcam.useExtendedTracking = false;
+        parametersWebcam.cameraName = hardwareMap.get(WebcamName.class, "Webcam");
+        parametersWebcam.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        vuforia = new VuforiaLocalizerImpl(parametersWebcam);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+        vuforia.setFrameQueueCapacity(1);
+        CameraDevice.getInstance().setFlashTorchMode(true);
+
     }
 
+    Bitmap getImage() throws InterruptedException {
+        Image img;
+        img = getImageFromFrame(vuforia.getFrameQueue().take(), PIXEL_FORMAT.RGB565);
+        Bitmap btm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
+        btm.copyPixelsFromBuffer(img.getPixels());
+        return btm;
+
+    }
+
+    Image getImageFromFrame(VuforiaLocalizer.CloseableFrame frame, int format) {
+        long NI = frame.getNumImages();
+        for (int i = 0; i < NI; i++) {
+            if (frame.getImage(i).getFormat() == format) {
+                return frame.getImage(i);
+            }
+        }
+        return null;
+    }
+
+    boolean ConusRq(double rr, double gr, double br, double angle, double r, double g, double b) {
+        double anglerr = Math.acos((rr * r + gr * g + br * b) / (Math.sqrt(rr * rr + gr * gr + br * br) * Math.sqrt(r * r + g * g + b * b)));
+        //telemetry.addData("anglerr", anglerr);
+        //telemetry.addData("anglenon", angle);
+        if (angle > anglerr) {
+            return true;
+        }
+        return false;
+    }
+
+    int MgI = 0;
+    int GrI = 0;
+    int CnI = 0;
+
+    void analyze(int red, int green, int blue) {
+        boolean Mg = ConusRq(220, 70, 120, 0.2, red, green, blue);
+        boolean Gr = ConusRq(50, 120, 50, 0.3, red, green, blue);
+        boolean Cn = ConusRq(50, 130, 140, 0.15, red, green, blue);
+        if (Mg) {MgI=MgI+1; telemetry.addData("Mg detecked! Total count", MgI); }
+        if (Gr) {GrI=GrI+1; telemetry.addData("Gr detecked! Total count", GrI); }
+        if (Cn) {CnI=CnI+1; telemetry.addData("Cn detecked! Total count", CnI); }
+    }
+
+    //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
+    //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
+
+
     public void rotate(double degrees) {
-        /*
-         1) 0 0 0 0: moves backwards
-         2) 0 0 0 1: rotates, while moving backwards and then shaking
-         3) 0 0 1 0: rotates moving backwards
-         4) 0 0 1 1: rotates a lot more 90 degress and shakes
-         5) 0 1 0 0:
-         6) 0 1 0 1:
-         7) 0 1 1 0:
-         8) 0 1 1 1: rotates around 1 motor
-         9) 1 0 0 0:
-        10) 1 0 0 1:
-        11) 1 0 1 0:
-        12) 1 0 1 1:
-        13) 1 1 0 0:
-        14) 1 1 0 1:
-        15) 1 1 1 0: rotates, slightly moves forward
-        16) 1 1 1 1:
-         test values
-         */  //rotation test\\
 
         double ERROR = 4;
-        while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
-            ERROR = degrees - getAngle();
-            double kr = 0.3;
-            double k = 0.003;
+        double Er0 = -degrees;
+        double errorFix=0;
+        double pw = 1;
+        double kr = 0.3;
 
-            double pwr = k * ERROR;
+        while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
+            ERROR  = degrees - getAngle();
+
+            double kp = 0.4;
+            double P = kp * ERROR / Er0 * pw; // P = -0.4
+
             double RELE = kr * Math.signum(ERROR);
-            double pwf = RELE;
+            if (RELE > 0.1) {P -= P;}
+
+            double pwf = RELE + P;
             setMtPower(pwf, pwf, -pwf, -pwf);
 
             telemetry.addData("ERROR", ERROR);
+            telemetry.addData("degrees", degrees);
+            telemetry.addData("getAngle", getAngle());
+            telemetry.addData("RELE", RELE);
+            telemetry.addData("Er0", Er0);
             telemetry.addData("pwf", pwf);
-            telemetry.addData("pwr", pwr);
+            telemetry.addData("P", P);
+            telemetry.addData("pw", pw);
+            telemetry.addData("lf", LF.getPower());
+            telemetry.addData("lb", LB.getPower());
+            telemetry.addData("rf", RF.getPower());
+            telemetry.addData("rb", RB.getPower());
+
             telemetry.update();
 
         }
@@ -170,4 +270,6 @@ public class Robot2022 extends Robot {
     }
 
 }
-//ftc dashboard
+
+ /* Я покушал. (на обед был суп с курицой и мараконы с котлетой!)
+ */

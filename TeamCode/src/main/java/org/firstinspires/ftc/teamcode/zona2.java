@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-@Disabled
-@Autonomous(name="test", group="")
-public class  testrotate extends LinearOpMode {
+
+@Autonomous(name="парковка 2 зона", group="")
+public class zona2 extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -14,8 +13,6 @@ public class  testrotate extends LinearOpMode {
 
         waitForStart();
 
-        R.rotate(-45);
-        R.goTimer(0, -0.3, 2000);
-
+        R.goTimer(0, -0.5, 2000);
     }
 }

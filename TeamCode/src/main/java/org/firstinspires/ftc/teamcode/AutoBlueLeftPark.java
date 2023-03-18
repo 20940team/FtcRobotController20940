@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="конус + парковка (справа со стороны драйвера)", group="")
+@Autonomous(name="конус + парковка 2 зона(справа со стороны драйвера)", group="")
 public class AutoBlueLeftPark extends LinearOpMode {
 
     @Override
@@ -13,16 +13,18 @@ public class AutoBlueLeftPark extends LinearOpMode {
 
         waitForStart();
 
-        R.armServo(0.75);
+
+        R.armServo(0.40);
         R.delay(200);
-        R.arm(-0.4, 600);
+        R.arm(-0.3, 1200);
         R.delay(200);
-        R.goTimer(0, -0.2, 500);
+        R.goTimer(0, -0.2, 800);
         R.delay(200);
-        R.armServo(0.4);
+        R.armServo(0.15);
         R.delay(200);
-        R.rotate(35);
+        R.rotate(-35);
         R.delay(200);
-        R.goTimer(0, -0.5, 2250);
+        R.goTimer(0, -0.5, 2000);
+
     }
 }

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="парковка", group="")
+@Autonomous(name="парковка красный", group="")
 public class AutoRedLeftPark extends LinearOpMode {
 
     @Override
@@ -13,6 +13,8 @@ public class AutoRedLeftPark extends LinearOpMode {
 
         waitForStart();
 
-            R.GoTimer(0, -0.5, 2500);
+        R.goTimer(-0.3, 0, 3000);
+        R.delay(500);
+        R.goTimer(0.3, 0, 500);
     }
 }
