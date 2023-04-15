@@ -83,7 +83,7 @@ public class Robot2022 extends Robot {
         dashboardTelemetry.addData("left trigger", gamepad1.left_trigger );
         dashboardTelemetry.update();
     }
-
+//TODO: create variables "open" and "close" in autonomous files
     public static double open = 0.15;
     public static double close = 0.40;
 
@@ -92,9 +92,9 @@ public class Robot2022 extends Robot {
         UP.setPower(gamepad2.right_stick_y);
 
         if (gamepad2.y) {
-            arm(-0.15, 100);
+            arm(-0.1, 100);
         } else if (gamepad2.b) {
-            arm(0.25, 400);}
+            arm(0.2, 400);}
 
         if (gamepad2.x) {
             grab.setPosition(close);
@@ -136,6 +136,12 @@ public class Robot2022 extends Robot {
         RF.setPower(rf);
         RB.setPower(rb);
     }
+    public void setMtZero() {
+        LF.setPower(0);
+        LB.setPower(0);
+        RF.setPower(0);
+        RB.setPower(0);
+    }
 
     public void goTimer(double x, double y, double time) {
         LF.setPower(y - x);
@@ -164,7 +170,6 @@ public class Robot2022 extends Robot {
 
 
     public void initVuforia() {
-
         final String VUFORIA_KEY = "AXmpKJj/////AAABmcT291bCTEQeoCRi1kDOyP8ApoUammAer00aO1owWHeTV7AmOtKkjy/8jRV99nQLFDMqq8eFrFk02tC3e24Hk9u4pnB+m2zRTTtVlIJ9G248PtXINEGUoPi+W2t53dbLT5+RSxBdMGDAKC7aeTv0tlpN1zNLnxYbVKqgbsIKU5C5FOGByrJU7xGP/qLDsY/TAlNbcq73vL9ClSAGo0Im+77mABDEXUVZilP05IR5sbXJYHo/J9O2U8ZfX4KnpnNbPWzzGBFpyKrVRNYihX7s/pjlitY6Fok2sQ+PX4XDoCu3dw/9rtnqpMwTkBtrzvmVuL01zVmKcf8e31FWafJ2I1CBJ5t2OJbrOO0m4NiELoUL";
 
         OpenGLMatrix targetPose     = null;
@@ -181,6 +186,7 @@ public class Robot2022 extends Robot {
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
         vuforia.setFrameQueueCapacity(1);
         CameraDevice.getInstance().setFlashTorchMode(true);
+
 
     }
 
@@ -203,10 +209,11 @@ public class Robot2022 extends Robot {
         return null;
     }
 
+
     boolean ConusRq(double rr, double gr, double br, double angle, double r, double g, double b) {
         double anglerr = Math.acos((rr * r + gr * g + br * b) / (Math.sqrt(rr * rr + gr * gr + br * br) * Math.sqrt(r * r + g * g + b * b)));
-        //telemetry.addData("anglerr", anglerr);
-        //telemetry.addData("anglenon", angle);
+        telemetry.addData("anglerr", anglerr);
+        telemetry.addData("anglenon", angle);
         if (angle > anglerr) {
             return true;
         }
@@ -216,6 +223,8 @@ public class Robot2022 extends Robot {
     int MgI = 0;
     int GrI = 0;
     int CnI = 0;
+
+    //TODO: rr, gr, br = ? cameratest ^
 
     void analyze(int red, int green, int blue) {
         boolean Mg = ConusRq(220, 70, 120, 0.2, red, green, blue);
@@ -229,6 +238,8 @@ public class Robot2022 extends Robot {
     //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
     //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
 
+    static double kd = 0.2;
+    static double kp = 0.4;
 
     public void rotate(double degrees) {
 
@@ -237,15 +248,23 @@ public class Robot2022 extends Robot {
         double errorFix=0;
         double pw = 1;
         double kr = 0.3;
+        double ErLast = 0;
 
         while (Math.abs(ERROR)>3 && linearOpMode.opModeIsActive()) {
             ERROR  = degrees - getAngle();
 
-            double kp = 0.4;
+            kp = 0.4;
             double P = kp * ERROR / Er0 * pw; // P = -0.4
 
+            kd = 0.2;
+            double ErD = ERROR - ErLast;
+            double D = kd * ErD * (1/ERROR);
+
+            if (Math.signum(D) > Math.signum(P)) {  D=P; }
+
             double RELE = kr * Math.signum(ERROR);
-            if (RELE > 0.1) {P -= P;}
+           // if (RELE > 0.1) {P -= P;}
+            ErLast = ERROR;
 
             double pwf = RELE + P;
             setMtPower(pwf, pwf, -pwf, -pwf);
@@ -268,8 +287,77 @@ public class Robot2022 extends Robot {
         }
         setMtPower(0, 0, 0, 0);
     }
+    void go(double cm) { //
+        double pw = 1;
+        double cc = (1450 * cm) / (9.5 * Math.PI);
+        double Er0 = cc;
+        double errorFix=0;
+        double ErLast = 0;
+        LF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        /*if (degrees < -180) {
+            degrees += 360;
+            pw = pw * -1;
+        }
+        if (degrees > 180) {
+            degrees -= 360;
+            pw = pw * -1;
+        }*/
+        double D = 1;
+        //while (LB.getCurrentPosition() < m) { setMtPower(-pw, -pw, pw, pw); }
+        while ( ( Math.abs(D) > 0.1 ||  Math.abs(cc) - Math.abs(LF.getCurrentPosition()) > 10*Math.signum(cc)) && linearOpMode.opModeIsActive()) {
+
+            double Er = Math.abs(cc) - Math.abs(LF.getCurrentPosition());
+
+            double kp = 0.9;
+            double P = kp * Er / Er0 * pw;
+
+            double kd = 0.15;
+            double ErD = Er - ErLast;
+            D = kd * ErD * (1 / Er);
+
+            if (Math.signum(D) > Math.signum(P)) {  D=P; }
+
+            double kr = 0.2*Math.signum(cc);
+            double Rele = kr * Math.signum(Er);
+
+            ErLast = Er;
+
+
+
+            double pwf = (pw * (P+D+Rele))*Math.signum(Er); //Регулятор
+
+            //telemetry.addData("currPosition", LF.getCurrentPosition());
+            //telemetry.addData("cc", cc);
+            //telemetry.addData("Err", Er);
+            //telemetry.addData("cond1", cc - LF.getCurrentPosition());
+            //telemetry.addData("cond2", 10*Math.signum(cc));
+            //telemetry.addData("pwf", pwf);
+            //telemetry.addData("D", D);
+            //telemetry.update();
+
+            LF.setPower(pwf);
+            RB.setPower(-pwf);
+
+
+            /*telemetry.addData("cc", cc);
+            telemetry.addData("Er0", Er0);
+            telemetry.addData("Er", Er);
+            telemetry.addData("getCurrentPosition", LB.getCurrentPosition());
+            telemetry.addData("kp", kp);
+            telemetry.addData("Rele", Rele);
+            telemetry.addData("D", D);
+            telemetry.addData("pw", pw);
+            telemetry.addData("pwf", pwf);
+            telemetry.update();*/
+
+        }
+
+        LF.setPower(0);
+        RB.setPower(0);
+
+        delay(500);
+    }
 
 }
 
- /* Я покушал. (на обед был суп с курицой и мараконы с котлетой!)
- */
