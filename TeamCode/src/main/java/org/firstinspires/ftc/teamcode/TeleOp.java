@@ -20,6 +20,7 @@ public class TeleOp extends LinearOpMode {
         while (!isStopRequested()){
             R.driveOmni();
             R.teleOp();
+            //R.initLift();
             //R.telemetry();
         }
         telemetry.addData("Stop", "program");

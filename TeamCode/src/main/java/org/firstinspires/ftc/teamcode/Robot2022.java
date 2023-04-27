@@ -8,6 +8,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -27,6 +28,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.internal.vuforia.VuforiaLocalizerImpl;
+
+import java.util.concurrent.Delayed;
+
+import dalvik.system.DelegateLastClassLoader;
+
 @Config
 public class Robot2022 extends Robot {
     DcMotor RF, LF, LB, RB, UP;
@@ -83,9 +89,8 @@ public class Robot2022 extends Robot {
         dashboardTelemetry.addData("left trigger", gamepad1.left_trigger );
         dashboardTelemetry.update();
     }
-//TODO: create variables "open" and "close" in autonomous files
-    public static double open = 0.15;
-    public static double close = 0.40;
+    public static double open = 0.25;
+    public static double close = 0.5;
 
     public void teleOp() {
 
@@ -109,6 +114,24 @@ public class Robot2022 extends Robot {
         telemetry.addData("grab angles", grab.getPosition());
 
         telemetry.update();
+    }
+
+    public void initLift() {
+        if (gamepad2.dpad_down) {
+            setLift(2000);
+            delay(2500);
+        } if (gamepad2.dpad_up) {
+            setLift(5000);
+            delay(2500);
+        } if (gamepad2.dpad_left || gamepad2.dpad_right) {
+            setLift(3500);
+            delay(2500);
+        } if (!gamepad2.dpad_up && !gamepad2.dpad_down && !gamepad2.dpad_right && !gamepad2.dpad_left) {
+            UP.setPower(0);
+            delay(50);
+            telemetry.addData("work ended in: ", UP.getCurrentPosition());
+            telemetry.update();
+        }
     }
 
     public void driveOmni() {
@@ -142,6 +165,13 @@ public class Robot2022 extends Robot {
         RF.setPower(0);
         RB.setPower(0);
     }
+    public void setMtAll(double power) {
+        LF.setPower(power);
+        LB.setPower(power);
+        RF.setPower(power);
+        RB.setPower(power);
+
+    }
 
     public void goTimer(double x, double y, double time) {
         LF.setPower(y - x);
@@ -149,10 +179,7 @@ public class Robot2022 extends Robot {
         RF.setPower(y + x);
         RB.setPower(y - x);
         delay(time);
-        LF.setPower(0);
-        LB.setPower(0);
-        RF.setPower(0);
-        RB.setPower(0);
+       setMtZero();
     }
 
 
@@ -175,7 +202,7 @@ public class Robot2022 extends Robot {
         OpenGLMatrix targetPose     = null;
         String targetName           = "";
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("Camera", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("Webcam", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parametersWebcam = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
         parametersWebcam.vuforiaLicenseKey = VUFORIA_KEY;
@@ -224,10 +251,10 @@ public class Robot2022 extends Robot {
     int GrI = 0;
     int CnI = 0;
 
-    //TODO: rr, gr, br = ? cameratest ^
+
 
     void analyze(int red, int green, int blue) {
-        boolean Mg = ConusRq(220, 70, 120, 0.2, red, green, blue);
+        boolean Mg = ConusRq(225, 70, 120, 0.2, red, green, blue);
         boolean Gr = ConusRq(50, 120, 50, 0.3, red, green, blue);
         boolean Cn = ConusRq(50, 130, 140, 0.15, red, green, blue);
         if (Mg) {MgI=MgI+1; telemetry.addData("Mg detecked! Total count", MgI); }
@@ -258,12 +285,12 @@ public class Robot2022 extends Robot {
 
             kd = 0.2;
             double ErD = ERROR - ErLast;
-            double D = kd * ErD * (1/ERROR);
+            //double D = kd * ErD * (1/ERROR);
 
-            if (Math.signum(D) > Math.signum(P)) {  D=P; }
+          //  if (Math.signum(D) > Math.signum(P)) {  D=P; }
 
             double RELE = kr * Math.signum(ERROR);
-           // if (RELE > 0.1) {P -= P;}
+            if (RELE > 0.1) {P -= P;}
             ErLast = ERROR;
 
             double pwf = RELE + P;
@@ -316,7 +343,7 @@ public class Robot2022 extends Robot {
             double ErD = Er - ErLast;
             D = kd * ErD * (1 / Er);
 
-            if (Math.signum(D) > Math.signum(P)) {  D=P; }
+           // if (Math.signum(D) > Math.signum(P)) {  D=P; }
 
             double kr = 0.2*Math.signum(cc);
             double Rele = kr * Math.signum(Er);
@@ -325,7 +352,7 @@ public class Robot2022 extends Robot {
 
 
 
-            double pwf = (pw * (P+D+Rele))*Math.signum(Er); //Регулятор
+            double pwf = (pw * (P+Rele))*Math.signum(Er); //Регулятор
 
             //telemetry.addData("currPosition", LF.getCurrentPosition());
             //telemetry.addData("cc", cc);
@@ -336,7 +363,7 @@ public class Robot2022 extends Robot {
             //telemetry.addData("D", D);
             //telemetry.update();
 
-            LF.setPower(pwf);
+            LF.setPower(-pwf);
             RB.setPower(-pwf);
 
 
@@ -358,6 +385,50 @@ public class Robot2022 extends Robot {
 
         delay(500);
     }
+    void setLift(double ticks) {
+        UP.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        UP.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double ErLast = 0;
+        double rI = 0;
+        //double dt = 0;
+        while ( Math.abs(ticks - UP.getCurrentPosition()) > 5 && linearOpMode.opModeIsActive() ) {
+            //dt += 1;
+            double Er = ticks - UP.getCurrentPosition();
+
+            double kp = 0.005; //15
+            double P = kp * Er;
+
+            double ki = 0.00003;
+            rI = rI + Er;
+            double I = rI * ki;
+
+            double kd = 0.0003; //2
+            double ErD = Er - ErLast;
+            double D = kd * ErD;
+
+            double pwf = P + I + D;
+
+            ErLast = Er;
+
+            telemetry.addData("UP", UP.getCurrentPosition());
+            telemetry.addData("Err", Er);
+            telemetry.addData("P", P);
+            telemetry.addData("rI", rI);
+            telemetry.addData("I", I);
+            telemetry.addData("ErD", ErD);
+            telemetry.addData("D", D);
+            telemetry.addData("pwf", pwf);
+            telemetry.update();
+
+            UP.setPower(pwf);
+
+            delay(50);
+        }
+        telemetry.addData("Work ended in", UP.getCurrentPosition());
+        UP.setPower(0);
+        delay(50);
+    }
+
 
 }
 
