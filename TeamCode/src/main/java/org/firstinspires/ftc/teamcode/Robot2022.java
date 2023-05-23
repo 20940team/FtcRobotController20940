@@ -39,6 +39,7 @@ public class Robot2022 extends Robot {
     Servo grab;
     BNO055IMU imu;
     VuforiaLocalizerImpl vuforia;
+    public double startTick;
 
     Robot2022(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode linearOpMode) {
         super(hardwareMap, telemetry, linearOpMode);
@@ -75,6 +76,7 @@ public class Robot2022 extends Robot {
     public void init() {
         RF.setDirection(DcMotorSimple.Direction.REVERSE);
         RB.setDirection(DcMotorSimple.Direction.REVERSE);
+        startTick = UP.getCurrentPosition();
     }
 
     public void telemetry() {
@@ -95,6 +97,9 @@ public class Robot2022 extends Robot {
     public void teleOp() {
 
         UP.setPower(gamepad2.right_stick_y);
+        if (startTick < UP.getCurrentPosition()) {
+            UP.setPower(-0.15);
+        }
 
         if (gamepad2.y) {
             arm(-0.1, 100);
@@ -189,7 +194,11 @@ public class Robot2022 extends Robot {
         UP.setPower(-0.15);
     }
 
-    public void armServo(double x) { grab.setPosition(x);}
+    public void armServo(double x) { grab.setPosition(x); telemetry.addData("outated", "use servoClose or servoOpen");}
+
+    public void servoClose() { grab.setPosition(close);}
+
+    public void servoOpen() { grab.setPosition(open); }
 
 
     //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
@@ -254,12 +263,12 @@ public class Robot2022 extends Robot {
 
 
     void analyze(int red, int green, int blue) {
-        boolean Mg = ConusRq(225, 70, 120, 0.2, red, green, blue);
+        boolean Mg = ConusRq(220, 70, 120, 0.2, red, green, blue);
         boolean Gr = ConusRq(50, 120, 50, 0.3, red, green, blue);
         boolean Cn = ConusRq(50, 130, 140, 0.15, red, green, blue);
-        if (Mg) {MgI=MgI+1; telemetry.addData("Mg detecked! Total count", MgI); }
-        if (Gr) {GrI=GrI+1; telemetry.addData("Gr detecked! Total count", GrI); }
-        if (Cn) {CnI=CnI+1; telemetry.addData("Cn detecked! Total count", CnI); }
+        if (Mg) {MgI=MgI+1; telemetry.addData("Mg detected! Total count", MgI); }
+        if (Gr) {GrI=GrI+1; telemetry.addData("Gr detected! Total count", GrI); }
+        if (Cn) {CnI=CnI+1; telemetry.addData("Cn detected! Total count", CnI); }
     }
 
     //CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA_CAMERA\\
@@ -427,6 +436,51 @@ public class Robot2022 extends Robot {
         telemetry.addData("Work ended in", UP.getCurrentPosition());
         UP.setPower(0);
         delay(50);
+    }
+    void setLiftHold(double ticks) {
+        UP.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        UP.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        double ErLast = 0;
+        double rI = 0;
+        //double dt = 0;
+        while ( Math.abs(ticks - UP.getCurrentPosition()) > 5 && linearOpMode.opModeIsActive() ) {
+            //dt += 1;
+            double Er = ticks - UP.getCurrentPosition();
+
+            double kp = 0.005; //15
+            double P = kp * Er;
+
+            double ki = 0.00003;
+            rI = rI + Er;
+            double I = rI * ki;
+
+            double kd = 0.0003; //2
+            double ErD = Er - ErLast;
+            double D = kd * ErD;
+
+            double pwf = P + I + D;
+
+            ErLast = Er;
+
+            telemetry.addData("UP", UP.getCurrentPosition());
+            telemetry.addData("Err", Er);
+            telemetry.addData("P", P);
+            telemetry.addData("rI", rI);
+            telemetry.addData("I", I);
+            telemetry.addData("ErD", ErD);
+            telemetry.addData("D", D);
+            telemetry.addData("pwf", pwf);
+            telemetry.update();
+
+            UP.setPower(pwf);
+
+            delay(50);
+        }
+        telemetry.addData("Work ended in", UP.getCurrentPosition());
+        delay(50);
+    }
+    public void liftOff() {
+        UP.setPower(0);
     }
 
 

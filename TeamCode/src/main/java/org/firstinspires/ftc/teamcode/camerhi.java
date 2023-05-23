@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import java.util.concurrent.Delayed;
 
-@Autonomous(name="парковка по камере да", group="")
-public class cameratest extends LinearOpMode {
+@Autonomous(name="парковка по камере с высокий да", group="")
+public class camerhi extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -19,7 +19,6 @@ public class cameratest extends LinearOpMode {
         R.init();
 
         while ( !isStarted() ) {
-
             R.MgI = 0;
             R.GrI = 0;
             R.CnI = 0;
@@ -28,12 +27,12 @@ public class cameratest extends LinearOpMode {
             telemetry.addData("State", "Detecting");
             telemetry.update();
 
-             for (int i = 250; i < 390; i = i + 10) {
+            for (int i = 250; i < 390; i = i + 10) {
                 for (int l = 150; l < 210; l = l + 10) {
                     int Red = Color.red(c.getPixel(i, l));
                     int Green = Color.green(c.getPixel(i, l));
-                   int Blue = Color.blue(c.getPixel(i, l));
-            R.analyze(Red, Green, Blue);
+                    int Blue = Color.blue(c.getPixel(i, l));
+                    R.analyze(Red, Green, Blue);
                     telemetry.addData("i", i);
                     telemetry.addData("l", l);
                     telemetry.addData("red", Red);
@@ -45,9 +44,9 @@ public class cameratest extends LinearOpMode {
                     telemetry.update();
                 }
             }
-             telemetry.addData("Exit from for. 1 zone >", R.MgI + "<");
-             telemetry.addData("Exit from for. 2 zone >", R.GrI + "<");
-             telemetry.addData("Exit from for. 3 zone >", R.CnI + "<");
+            telemetry.addData("Exit from for. 1 zone >", R.MgI + "<");
+            telemetry.addData("Exit from for. 2 zone >", R.GrI + "<");
+            telemetry.addData("Exit from for. 3 zone >", R.CnI + "<");
 
         }
 
@@ -86,28 +85,41 @@ public class cameratest extends LinearOpMode {
             telemetry.addData("cn", "░╚════╝░╚═╝░░╚══╝");
 
         }
-            telemetry.addData("Mg count", R.MgI);
-            telemetry.addData("Gr count", R.GrI);
-            telemetry.addData("Cn count", R.CnI);
-            telemetry.update();
+        telemetry.addData("Mg count", R.MgI);
+        telemetry.addData("Gr count", R.GrI);
+        telemetry.addData("Cn count", R.CnI);
+        telemetry.update();
 
-                R.delay(100);
-                R.go(15);
-                R.rotate(45);
-                R.go(75);
-                R.delay(100);
+        R.servoClose();
+        R.delay(100);
+        R.go(15);
+        R.rotate(45);
+        R.delay(100);
+        R.go(90);
+        R.delay(100);
+        R.go(-10);
+        R.delay(100);
+        R.rotate(135);
+        R.delay(100);
+        R.setLiftHold(-5000);
+        R.delay(100);
+        R.go(80);
+        R.delay(100);
+        R.servoOpen();
+        R.delay(100);
+        R.liftOff();
 
-                if (s == "Mg") {
-                R.rotate(135);
-                R.delay(100);
-                R.go(70);
-            } else if (s == "Gr"){
-                R.delay(1);
-            } else if (s == "Ns" || s == "Cn") {
-                R.rotate(-40);
-                R.delay(100);
-                R.go(70);
-            }
+
+
+        /* if (s == "Mg") {
+            R.rotate(135);
+            R.go(80);
+        } else if (s == "Gr") {
+            R.delay(1);
+        } else if (s == "Cn") {
+            R.rotate(-40);
+            R.go(80);
+        } */
 
     }
 }
